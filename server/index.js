@@ -20,7 +20,7 @@ app.post("/register", async (req, res) => {
         "INSERT INTO users(username,password,balance) VALUES($1,$2,$3)",
         [usernmame, password, 100000]
       );
-      res.json(q1.rows);
+      res.json("Successfully logged in");
     }
   } catch (err) {
     console.error(err.message);
@@ -35,6 +35,7 @@ app.post("/login", async (req, res) => {
     const q1 = await pool.query("SELECT * FROM users WHERE username = $1", [
       username,
     ]);
+    // console.log(q1);
     if (q1.rowCount == 0) {
       res.json("Invalid username");
     } else {
