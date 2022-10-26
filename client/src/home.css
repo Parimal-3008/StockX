@@ -1,0 +1,33 @@
+  
+  .parent1
+  {
+    margin-top: 1%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+  }
+ .left
+ {
+    width:20%;
+    height: 60vh;
+    border: 2px solid red;
+ }
+ .middle
+ {
+    width: 100%;
+    height: 60vh;
+    border: 2px solid blue;
+ }
+ .right
+ {
+    width: 30%;
+    height: 60vh;
+    border: 2px solid yellow;
+ }
+ .buysellblock
+ {
+    margin-top: 1%;
+    width: 100%;
+    height:20vh;
+    border: 2px solid black;
+ }
