@@ -1,0 +1,55 @@
+#parentcard {
+  height: 10vh;
+  width: 100%;
+  display: flex;
+  border: 1px solid grey;
+  border-radius: 5px;
+  padding-left: 13px;
+  margin-bottom: 5px;
+  box-shadow: 4px 3px 4px 1px #969696;
+}
+#parentcard:hover{
+  cursor: pointer;
+  text-decoration: underline;
+  background-color: #ede5e5;
+}
+#leftcard {
+  width: 80%;
+  height: 100%;
+  margin-top: 5px;
+  display: block;
+}
+#rightcard12 {
+  width: 20%;
+  height: 100%;
+  margin-right: 13px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* background-color: white; */
+  font-weight: bold;
+  color:  rgb(0, 217, 0);
+}
+#rightcard13 {
+  width: 20%;
+  height: 100%;
+  margin-right: 13px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* background-color: white; */
+  font-weight: bold;
+  color: rgb(249, 96, 96);
+}
+#topcard,
+#bottomcard {
+  height: 50%;
+  width: 100%;
+}
+#topcard {
+  font-weight: bolder;
+  font-size: large;
+}
+#bottomcard {
+  font-weight: 500;
+}

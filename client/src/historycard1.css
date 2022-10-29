@@ -1,0 +1,16 @@
+#parentcard1 {
+    height: 5vh;
+    width: 100%;
+    display: flex;
+    border: 1px solid grey;
+    border-radius: 5px;
+    padding-left: 13px;
+    margin-bottom: 5px;
+    box-shadow: 4px 3px 4px 1px #969696;
+    overflow: scroll;
+  }
+ #price1,#quantity1,#date1
+ {
+    margin-left: 23px;
+ }
+  
