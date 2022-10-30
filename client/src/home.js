@@ -12,68 +12,70 @@ import ShowData from "./ShowData";
 
 import HistoryCard1 from "./historycard1";
 export default function Home(props) {
+  
+      
   let funds = 1000;
   let currentprice = 5;
   let availablestock = 20;
   let currentstockhistory = [
     {
-      name:"GE",
+      name: "GE",
       status: "buy",
       quantity: 69,
       price: 1000,
       date: "2022-10-24 12:33:19.387",
     },
     {
-      name:"GE",
+      name: "GE",
       status: "buy",
       quantity: 69,
       price: 1000,
       date: "2022-10-24 12:33:19.387",
     },
     {
-      name:"GE",
+      name: "GE",
       status: "buy",
       quantity: 69,
       price: 1000,
       date: "2022-10-24 12:33:19.387",
     },
     {
-      name:"GE",
+      name: "GE",
       status: "buy",
       quantity: 69,
       price: 1000,
       date: "2022-10-24 12:33:19.387",
     },
     {
-      name:"GE",
+      name: "GE",
       status: "buy",
       quantity: 69,
       price: 1000,
       date: "2022-10-24 12:33:19.387",
     },
     {
-      name:"GE",
+      name: "GE",
       status: "buy",
       quantity: 69,
       price: 1000,
       date: "2022-10-24 12:33:19.387",
     },
     {
-      name:"GE",
+      name: "GE",
       status: "buy",
       quantity: 39,
       price: 1000,
       date: "2022-10-24 12:27:14.413",
     },
     {
-      name:"GE",
+      name: "GE",
       status: "buy",
       quantity: 1,
       price: 1000,
       date: "2022-10-24 12:28:03.878",
     },
     {
-      name:"GE",
+      name: "GE",
       status: "sell",
       quantity: 40,
       price: 1000,
@@ -134,13 +136,13 @@ export default function Home(props) {
     setpara("p2");
     setsubmitbutton("submitbuttonsell");
   };
+  
   return (
     <div id="root">
-      <Nav root={props.root}/>
+      <Nav root={props.root} username={props.username}/>
       <div className="parent1">
         <div className="left">
-          {
-            compamylist.map((p) => {
+          {compamylist.map((p) => {
             return (
               <Ccard
                 name={p.name}
@@ -156,7 +158,6 @@ export default function Home(props) {
           {/* <button onClick={dataforchart(props)}>Data</button> */}
           <FixedHeaderStory
             fixedHeader
-           
             fixedHeaderScrollHeight="100%"
             columns={columns}
             data={currentstockhistory}
@@ -195,10 +196,8 @@ export default function Home(props) {
           </button>
         </div>
         <div className="right2">
-         <ShowData title = {"FUNDS"} value = {funds} />
-         <ShowData title = {"Stocks"} value = {availablestock} />
-            
-         
+          <ShowData title={"FUNDS"} value={props.funds} />
+          <ShowData title={"Stocks"} value={20} />
         </div>
       </div>
     </div>

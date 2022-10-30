@@ -183,20 +183,33 @@ app.post("/buy_sell", async (req, res) => {
     }
   }
 });
-
-app.get("/portfolio", async (req, res) => {
+app.post("/funds",async (req, res)=>{
+  
+const username = req.body.username; 
+console.log(username);
+  const qid = await pool.query("SELECT * FROM users WHERE username=$1", [
+    username,
+  ]);
+  // const id = qid.rows[0].id;
+  // const balance = qid.rows[0].balance;
+  // console.log(username + qid.rows[0].balance);
+  res.json(qid.rows[0].balance);
+});
+app.post("/portfolio", async (req, res) => {
   const username = req.body.username;
   const qid = await pool.query("SELECT * FROM users WHERE username=$1", [
     username,
   ]);
-  const id = qid.rows[0].id;
-  const balance = qid.rows[0].balance;
+  console.log(username + qid.rows[0])
+
+  const id = await qid.rows[0].id;
+  // const balance = qid.rows[0].balance;
   const q1 = await pool.query("SELECT * FROM holdings WHERE id=$1", [id]);
 
   res.json(q1.rows);
 });
 
-app.get("/history", async (req, res) => {
+app.post("/history", async (req, res) => {
   const username = req.body.username;
   const qid = await pool.query("SELECT * FROM users WHERE username=$1", [
     username,

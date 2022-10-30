@@ -72,73 +72,73 @@ export default function Portfolio(props) {
   ];
   let hold = [
     {
-      name: "GE",
+      stockname: "GE",
       quantity: 69,
-      iprice: 1000,
+      total_price: 1000,
       ivalue: 2000,
-      status: 1000,
+       
     },
     {
-      name: "ADBE",
+       stockname: "ADBE",
       quantity: 69,
-      iprice: 1000,
+      total_price: 1000,
       ivalue: 2000,
-      status: 1000,
+       
     },
     {
-      name: "UTI",
+       stockname: "UTI",
       quantity: 69,
-      iprice: 1000,
+      total_price: 1000,
       ivalue: 2000,
-      status: 1000,
+       
     },
     {
-      name: "MRF",
+       stockname: "MRF",
       quantity: 69,
-      iprice: 1000,
+      total_price: 1000,
       ivalue: 2000,
-      status: 1000,
+       
     },
     {
-      name: "META",
+       stockname: "META",
       quantity: 69,
-      iprice: 1000,
+      total_price: 1000,
       ivalue: 2000,
-      status: 1000,
+       
     },
     {
-      name: "CSCO",
+       stockname: "CSCO",
       quantity: 69,
-      iprice: 1000,
+      total_price: 1000,
       ivalue: 2000,
-      status: 1000,
+       
     },
     {
-      name: "MSFT",
+       stockname: "MSFT",
       quantity: 69,
-      iprice: 1000,
+      total_price: 1000,
       ivalue: 2000,
-      status: 1000,
+       
     },
     {
-      name: "IBM",
+       stockname: "IBM",
       quantity: 69,
-      iprice: 1000,
+      total_price: 1000,
       ivalue: 2000,
-      status: 1000,
+       
     },
     {
-      name: "HON",
+       stockname: "HON",
       quantity: 69,
-      iprice: 1000,
+      total_price: 1000,
       ivalue: 2000,
-      status: 1000,
+       
     },
   ];
   const columns2 = [
     {
       name: "name",
-      selector: (row) => row.name,
+      selector: (row) => row.stockname,
     },
     {
       name: "quantity",
@@ -146,7 +146,7 @@ export default function Portfolio(props) {
     },
     {
       name: "Investment",
-      selector: (row) => row.iprice,
+      selector: (row) => row.total_price,
     },
     {
       name: "Current Value",
@@ -154,7 +154,7 @@ export default function Portfolio(props) {
     },
     {
       name: "Profit/Loss",
-      selector: (row) => row.status,
+      selector: (row) => row.ivalue-row.total_price,
     },
   ];
   const columns = [
@@ -179,6 +179,7 @@ export default function Portfolio(props) {
       selector: (row) => row.status,
     },
   ];
+  console.log(props)
 
   return (
     <div>
