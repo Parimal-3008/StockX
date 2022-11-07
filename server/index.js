@@ -1,29 +1,63 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
 const pool = require("./db");
+const dotenv = require("dotenv");
+const jwt = require("jsonwebtoken");
+
 app.use(cors());
 app.use(express.json());
+dotenv.config();
 
+app.post("/auth", async (req, res) => {
+  const token = req.body["token"];
+  console.log("in auth123");
+  // if(token == undefined )
+  // return;
+  if (token == undefined) {
+    res.json({ status: "NO1" });
+    return;
+  }
+  try {
+    jwt.verify(token, `process.env.ACCESS_TOKEN_SECRET`, (err, user) => {
+      if (err) {
+        console.log("autherror" + token);
+        res.sendStatus(403);
+        return;
+      }
+    });
+    res.json({ status: "ok" });
+    return;
+  } catch (error) {
+    console.log(error + "123");
+  }
+});
 app.post("/register", async (req, res) => {
   try {
     console.log(req.body);
+
     const usernmame = req.body.username;
     const password = req.body.password;
     const q2 = await pool.query("SELECT * FROM users WHERE username = $1", [
       usernmame,
     ]);
     if (q2.rowCount > 0) {
-      res.json("username already taken Select new Username");
+      {
+        res.json("username already taken Select new Username");
+        return;
+      }
     } else {
       const q1 = await pool.query(
         "INSERT INTO users(username,password,balance) VALUES($1,$2,$3)",
         [usernmame, password, 100000]
       );
       res.json("Successfully logged in");
+      return;
     }
   } catch (err) {
     console.error(err.message);
+    return;
   }
 });
 
@@ -32,18 +66,29 @@ app.post("/login", async (req, res) => {
     console.log(req.body);
     const username = req.body.username;
     const password = req.body.password;
+    const user = { name: username };
+    const atoken = jwt.sign(user, `process.env.ACCESS_TOKEN_SECRET`);
     const q1 = await pool.query("SELECT * FROM users WHERE username = $1", [
       username,
     ]);
     // console.log(q1);
     if (q1.rowCount == 0) {
       res.json("Invalid username");
+      return;
     } else {
-      if (q1.rows[0].password == password) res.json("Login succesfull");
-      else res.json("Invalid password");
+      if (q1.rows[0].password == password) {
+        res.json({ accesstoken: atoken, id: q1.rows[0].id });
+        return;
+      } else {
+        res.json("Invalid password");
+        return;
+      }
     }
+
+    console.log("OK!!");
   } catch (err) {
     console.error(err.message);
+    return;
   }
 });
 
@@ -61,7 +106,7 @@ app.post("/buy_sell", async (req, res) => {
   const st = req.body.status; //buy or sell
   const current_price = req.body.current_price;
   console;
-  if (st == "buy") {
+  if (st == "BUY") {
     const q1 = await pool.query("SELECT * FROM holdings WHERE id=$1", [id]);
     console.log(q1);
     if (q1.rowCount > 0) {
@@ -74,7 +119,6 @@ app.post("/buy_sell", async (req, res) => {
       }
       if (present != null) {
         // update in database
-
         if (balance >= current_price * quantity) {
           const q3 = await pool.query(
             "UPDATE holdings SET quantity=$1, total_price=$2 WHERE id=$3 AND stockname=$4",
@@ -93,9 +137,9 @@ app.post("/buy_sell", async (req, res) => {
             "UPDATE users SET balance=$1 WHERE id=$2",
             [balance - current_price * quantity, id]
           );
-          res.json("bought ");
+          return res.json("bought ");
         } else {
-          res.json("NOT enough funds");
+          return res.json("NOT enough funds");
         }
       } else {
         // inserting in db
@@ -113,9 +157,9 @@ app.post("/buy_sell", async (req, res) => {
             "UPDATE users SET balance=$1 WHERE id=$2",
             [balance - current_price * quantity, id]
           );
-          res.json("inserted");
+          return res.json("inserted");
         } else {
-          res.json("Not enough funds");
+          return res.json("Not enough funds");
         }
       }
     } else {
@@ -132,16 +176,16 @@ app.post("/buy_sell", async (req, res) => {
           balance + current_price * quantity,
           id,
         ]);
-        res.json("Buyed Successfully");
+        return res.json("Buyed Successfully");
       } else {
-        res.json("NOT enough funds");
+        return res.json("NOT enough funds");
       }
     }
-  } else if (st == "sell") {
+  } else if (st == "SELL") {
     const q1 = await pool.query("SELECT * FROM holdings WHERE id=$1", [id]);
     console.log(q1.rows);
     if (q1.rowCount == 0) {
-      res.json("Never purchased");
+      return res.json("Never purchased");
     } else {
       let present = null;
 
@@ -153,7 +197,7 @@ app.post("/buy_sell", async (req, res) => {
       }
       console.log(present);
       if (present == null) {
-        res.json("Never bought this stock");
+        return res.json("Never bought this stock");
       } else {
         if (q1.rows[present].quantity < quantity) res.json("Not enough stocks");
         else {
@@ -177,47 +221,65 @@ app.post("/buy_sell", async (req, res) => {
             "UPDATE users SET balance=$1 WHERE id=$2",
             [balance + current_price * quantity, id]
           );
-          res.json("selled ");
+          return res.json("selled ");
         }
       }
     }
   }
 });
-app.post("/funds",async (req, res)=>{
-  
-const username = req.body.username; 
-console.log(username);
-  const qid = await pool.query("SELECT * FROM users WHERE username=$1", [
-    username,
-  ]);
-  // const id = qid.rows[0].id;
-  // const balance = qid.rows[0].balance;
-  // console.log(username + qid.rows[0].balance);
-  res.json(qid.rows[0].balance);
+app.post("/funds", async (req, res) => {
+  try {
+    const username = req.body.username;
+
+    console.log(username);
+    const qid = await pool.query("SELECT * FROM users WHERE username=$1", [
+      username,
+    ]);
+
+    res.json({ funds: qid.rows[0].balance });
+    return;
+  } catch (error) {
+    console.log(error);
+    return;
+  }
 });
 app.post("/portfolio", async (req, res) => {
-  const username = req.body.username;
-  const qid = await pool.query("SELECT * FROM users WHERE username=$1", [
-    username,
-  ]);
-  console.log(username + qid.rows[0])
+  try {
+    const username = req.body.username;
+    if (username == undefined) return;
+    const qid = await pool.query("SELECT * FROM users WHERE username=$1", [
+      username,
+    ]);
+    if (qid == undefined) return;
+    console.log(username + qid.rows[0]);
 
-  const id = await qid.rows[0].id;
-  // const balance = qid.rows[0].balance;
-  const q1 = await pool.query("SELECT * FROM holdings WHERE id=$1", [id]);
-
-  res.json(q1.rows);
+    const id = qid.rows[0].id;
+    // const balance = qid.rows[0].balance;
+    const q1 = await pool.query("SELECT * FROM holdings WHERE id=$1", [id]);
+    res.json({ portfolio: q1.rows });
+    return;
+  } catch (error) {
+    console.log(error);
+    return;
+  }
 });
 
 app.post("/history", async (req, res) => {
-  const username = req.body.username;
-  const qid = await pool.query("SELECT * FROM users WHERE username=$1", [
-    username,
-  ]);
-  const id = qid.rows[0].id;
-  const balance = qid.rows[0].balance;
-  const q1 = await pool.query("SELECT * FROM history WHERE id=$1", [id]);
-  res.json(q1.rows);
+  try {
+    const username = req.body.username;
+    if (username == "") res.json({});
+    const qid = await pool.query("SELECT * FROM users WHERE username=$1", [
+      username,
+    ]);
+
+    const id = qid.rows[0].id;
+    const balance = qid.rows[0].balance;
+    const q1 = await pool.query("SELECT * FROM history WHERE id=$1", [id]);
+    res.json({ hist: q1.rows });
+    return;
+  } catch (error) {
+    return;
+  }
 });
 
 app.delete("/delete", async (req, res) => {
@@ -234,8 +296,8 @@ app.delete("/delete", async (req, res) => {
     id,
   ]);
   res.json("Succesful reset");
+  return;
 });
-
 app.listen(5000, () => {
   console.log("listening on port 5000");
 });

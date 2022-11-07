@@ -1,7 +1,34 @@
 import "./login.css";
 import Signup from "./signup";
 import Home from "./home";
-export default function Login(props) {
+import { redirect, useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie'
+import { useEffect, useLayoutEffect, useState } from "react";
+import request from "./request";
+
+
+export default function Login() {
+  const navigate = useNavigate();
+  const [loggedin , setLoggedin] = useState(-1);
+  useEffect(()=>{
+    (async ()=>{
+      if(Cookies.get('name')=="" || Cookies.get('id')=="" || Cookies.get("jwtoken")=="" )
+      {
+          return;
+      }
+      else
+      {
+        const {status} = await request("http://localhost:5000/auth", {}, "POST")
+        console.log("from login", status)
+        if(status=='ok')  {navigate('/')}
+        else{
+          setLoggedin(0)
+        }
+      }
+    })()
+  },[]) 
+
+  
   const senddetails = async () => {
     const u = document.getElementById("username").value;
     const p = document.getElementById("password").value;
@@ -20,18 +47,19 @@ export default function Login(props) {
         return response.json(); // call the json method on the response to get JSON
       })
       .then(function (d) {
-        if (d === "Login succesfull") {
-          props.root.render(
-            <>
-              <Home root={props.root} username={document.getElementById("username").value}/>
-            </>
-          );
-          // render home page
+        
+        if (d['accesstoken']) {
+          console.log(u);
+          Cookies.set('name',u);
+          Cookies.set('jwtoken',d['accesstoken']);
+          Cookies.set('id',d['id']);
+          navigate(`/`) ;
           console.log("logged in");
         } else alert("Fill valid credentials");
       });
   };
   return (
+    loggedin==0?
     <div className="root">
       <div id="left">
         <div className="temp">
@@ -60,7 +88,7 @@ export default function Login(props) {
             required="true"
           ></input>
           <div class="center" id="center">
-            <button id="login2" onClick={senddetails}>
+            <button id="login2" onClick={senddetails} >
               Log In
             </button>
           </div>
@@ -75,11 +103,11 @@ export default function Login(props) {
             <button
               id="create"
               onClick={() => {
-                props.root.render(
+               
                   <>
-                    <Signup root={props.root} />
+                    <Signup  />
                   </>
-                );
+                
               }}
             >
               Sign Up
@@ -88,5 +116,6 @@ export default function Login(props) {
         </div>
       </div>
     </div>
+    : <p>Authenticating...</p>
   );
 }

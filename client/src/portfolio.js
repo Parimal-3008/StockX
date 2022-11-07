@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { render } from "react-dom";
 import "./portfolio.css";
 import Nav from "./nav";
 import FixedHeaderStory from "react-data-table-component";
-
-export default function Portfolio(props) {
+import ProtectedRoute from "./ProtectedRoute";
+import { getfunds,gethistory,getportfolio } from "./getdata";
+export default function Portfolio() {
+  const [funds,setfunds] = useState("0");
+  const [hist,sethist] = useState({});
+  const [port,setport] = useState({});
   let currentstockhistory = [
     {
       name: "GE",
@@ -149,18 +153,18 @@ export default function Portfolio(props) {
       selector: (row) => row.total_price,
     },
     {
-      name: "Current Value",
-      selector: (row) => row.ivalue,
+      name: "Current Value",     
+      selector: (row) =>"20",
     },
     {
       name: "Profit/Loss",
-      selector: (row) => row.ivalue-row.total_price,
+      selector: (row) => (row.quantity* 20)-row.total_price,
     },
   ];
   const columns = [
     {
       name: "name",
-      selector: (row) => row.name,
+      selector: (row) => row.stockname,
     },
     {
       name: "date",
@@ -172,18 +176,24 @@ export default function Portfolio(props) {
     },
     {
       name: "price",
-      selector: (row) => row.price,
+      selector: (row) => row.sp,
     },
     {
       name: "status",
       selector: (row) => row.status,
     },
   ];
-  console.log(props)
+  useEffect(() => {
+    getfunds(setfunds);    
+    gethistory(sethist);
+    getportfolio(setport);
+    
+  }, []);
 
   return (
+    <ProtectedRoute>
     <div>
-      <Nav root={props.root} />
+      <Nav />
       <div id="parent4">
         <div id="upper4">
           <div id="left4">
@@ -202,7 +212,7 @@ export default function Portfolio(props) {
                 fixedHeader
                 fixedHeaderScrollHeight="100%"
                 columns={columns2}
-                data={hold}
+                data={port}
               />
             </div>
           </div>
@@ -215,11 +225,12 @@ export default function Portfolio(props) {
               fixedHeader
               fixedHeaderScrollHeight="90%"
               columns={columns}
-              data={currentstockhistory}
+              data={hist}
             />
           </div>
         </div>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }
