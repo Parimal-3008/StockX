@@ -68,10 +68,10 @@
 #bottom41
 {
     width: 100%;
-    height: 100%;
+    height: 90%;
     border-radius: 0 0 10px 10px;
     border: 1px solid #9997fa;
-    
+    display: flex;
     
 }
 #bottom40
@@ -80,5 +80,20 @@
     height: 90%;
     border: 1px solid #9997fa;
     border-radius: 0 0 10px 10px;
+   
+}
+#piechart1
+{
+    border: 1px solid #cececf;
+    width:40%;
+    margin : 2px;
+    border-radius: 20px;
+}
+#bargraph
+{
+    width: 60%;
+    border: 1px solid #cececf;
+    margin : 2px;
+    border-radius: 20px;
 }
 

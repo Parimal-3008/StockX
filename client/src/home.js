@@ -2,6 +2,7 @@ import React, { useState, useLayoutEffect, useEffect } from "react";
 import "./home.css";
 import Nav from "./nav";
 // import dataforchart from "./data";
+import Chart, {CommonSeriesSettings,  Series,Reduction,ArgumentAxis,Label,Format,ValueAxis,Title,Legend,Export,Tooltip,} from "devextreme-react/chart";
 import Cookies from "js-cookie";
 import compamylist from "./compamylist";
 import Slider from "@mui/material/Slider";
@@ -12,13 +13,17 @@ import FixedHeaderStory from "react-data-table-component";
 import ShowData from "./ShowData";
 import ProtectedRoute from "./ProtectedRoute";
 import { getfunds, getportfolio, gethistory } from "./getdata";
-import { FormControlUnstyledContext } from "@mui/base";
+import stockvalue from "./Stock_Values";
+import CanvasJSReact from "./canvasjs.react";
+//var CanvasJSReact = require('./canvasjs.react');
+var CanvasJS = CanvasJSReact.CanvasJS;
+var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 let p = 0;
 // import HistoryCard1 from "./historycard1";
 export default function Home() {
   // console.log( props);
 
-  let currentprice = 5;
+  // let currentprice = 5;
   // let availablestock = 20;
   let currentstockhistory = [];
 
@@ -29,81 +34,85 @@ export default function Home() {
   const [funds, setfunds] = useState("0");
   const [hist, sethist] = useState({});
   const [port, setport] = useState({});
-  const [maxamt, setmaxamt] = useState(funds / currentprice);
+  const [currentprice,setcurrentprice] =useState(5);
+  const [maxamt, setmaxamt] = useState(funds/currentprice);
   const [hist2, sethist2] = useState("");
   const [totalprice, setprice] = useState("");
   const [st, setst] = useState("BUY");
   const [counter, setcounter] = useState(1);
   const [submitbutton, setsubmitbutton] = useState("submitbuttonbuy");
   const [para, setpara] = useState("p1");
-  const [company, setcompany] = useState("ADBE");
-  const [aftertransaction,settrac] = useState(0);
-  const [currenthold,setcurrenthold] = useState("0");
+  const [company, setcompany] = useState("...");
+  const [aftertransaction, settrac] = useState(0);
+  const [currenthold, setcurrenthold] = useState("0");
+  const [graph, setgraph] = useState(undefined);
   // company refers to company name
-  const submit = async() => {
-        console.log(st);
-        const response = await fetch("http://localhost:5000/buy_sell", {
+  
+  const submit = async () => {
+    console.log(st);
+    const response = await fetch("http://localhost:5000/buy_sell", {
       method: "POST",
       mode: "cors",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username: Cookies.get('name'),stockname: company,quantity:counter, status:st, current_price:currentprice}),
+      body: JSON.stringify({
+        username: Cookies.get("name"),
+        stockname: company,
+        quantity: counter,
+        status: st,
+        current_price: currentprice,
+      }),
     })
       .then(function (response) {
-       
         return response.json(); // call the json method on the response to get JSON
       })
-       .then(function (d) {
+      .then(function (d) {
         console.log(d);
       });
-      console.log("DONE");
-      getfunds(setfunds);    
-      gethistory(sethist);
-      getportfolio(setport);
-      if(st==="BUY")
-      setmaxamt(funds/currentprice);
-      else
-      {
-        let yu=0;;
-        for(let i in port)
-        {
-          // console.log("ino"+port[i].stockname)
-          if(port[i].stockname==company){
-           yu=port[i].quantity;break;}
+    console.log("DONE");
+    getfunds(setfunds);
+    gethistory(sethist);
+    getportfolio(setport);
+    if (st === "BUY") setmaxamt(funds / currentprice);
+    else {
+      let yu = 0;
+      for (let i in port) {
+        // console.log("ino"+port[i].stockname)
+        if (port[i].stockname == company) {
+          yu = port[i].quantity;
+          break;
         }
-      
-        setmaxamt(yu);
-        setcurrenthold(yu);
-        }
-          let temp2 = [];
-        console.log("yo" + company);
-    
-        for (let i in hist) {
-          if (hist[i].stockname === company) {
-            temp2.push({
-              status: hist[i].status,
-              stockname: hist[i].stockname,
-              quantity: hist[i].quantity,
-              sp: hist[i].sp,
-              date: hist[i].date,
-            });
-           
-          }
-        }
-    
-        if (temp2.length == 0)
-          temp2.push({
-            status: "-",
-            stockname: "-",
-            quantity: "-",
-            sp: "-",
-            date: "-",
-          });
-        console.log("asdf" + temp2);
-        sethist2(temp2);
+      }
 
+      setmaxamt(yu);
+      setcurrenthold(yu);
+    }
+    let temp2 = [];
+    console.log("yo" + company);
 
+    for (let i in hist) {
+      if (hist[i].stockname === company) {
+        temp2.push({
+          status: hist[i].status,
+          stockname: hist[i].stockname,
+          quantity: hist[i].quantity,
+          sp: hist[i].sp,
+          date: hist[i].date,
+        });
+      }
+    }
+
+    if (temp2.length == 0)
+      temp2.push({
+        status: "-",
+        stockname: "-",
+        quantity: "-",
+        sp: "-",
+        date: "-",
+      });
+    console.log("asdf" + temp2);
+    sethist2(temp2);
   };
   const columns = [
     {
@@ -123,12 +132,17 @@ export default function Home() {
       selector: (row) => row.date,
     },
   ];
-  const getcompany = (name123) => {
+  const getcompany = async (name123) => {
+    setcompany("...");
+    setgraph(undefined);
+    const r = await stockvalue(name123, "daily");
+    setgraph(r);
+    console.log(graph);
     setcompany(name123);
+    
     //chnage the grpah and stock history with curretn user over here
     console.log("in parent" + name123);
   };
-
   const lbuy = () => {
     setStyle1("afterlbuyclick");
     setStyle2("r");
@@ -136,7 +150,7 @@ export default function Home() {
     settemp2("b4");
     setst("BUY");
     setpara("p1");
-    setmaxamt(funds/currentprice);
+    setmaxamt(funds / currentprice);
     setsubmitbutton("submitbuttonbuy");
   };
   const rbuy = () => {
@@ -146,43 +160,39 @@ export default function Home() {
     settemp1("b4");
     setst("SELL");
     setpara("p2");
-    let yu=0;;
-      for(let i in port)
-      {
-        // console.log("ino"+port[i].stockname)
-        if(port[i].stockname==company){
-         yu=port[i].quantity;break;}
+    let yu = 0;
+    for (let i in port) {
+      // console.log("ino"+port[i].stockname)
+      if (port[i].stockname == company) {
+        yu = port[i].quantity;
+        break;
       }
-      setmaxamt(yu);
-      setcurrenthold(yu);
+    }
+    setmaxamt(yu);
+    setcurrenthold(yu);
     setsubmitbutton("submitbuttonsell");
   };
- 
+  
   useEffect(() => {
-    getfunds(setfunds);    
+    getfunds(setfunds);
     gethistory(sethist);
     getportfolio(setport);
-    
-    
   }, [funds]);
-  useEffect(()=>{
+  useEffect(() => {
     console.log("in st and company");
-    console.log(port+"..."+st);    
-      let yu=0;;
-      for(let i in port)
-      {
-        // console.log("ino"+port[i].stockname)
-        if(port[i].stockname==company){
-         yu=port[i].quantity;break;}
+    console.log(port + "..." + st);
+    let yu = 0;
+    for (let i in port) {
+      if (port[i].stockname == company) {
+        yu = port[i].quantity;
+        break;
       }
-      if(st==="BUY")
-       setmaxamt(funds/currentprice);
-      else
-      setmaxamt(yu);
-      setcurrenthold(yu);
-      console.log("holding"+yu);  
-
-  },[company,port,hist,hist2])
+    }
+    if (st === "BUY") setmaxamt(funds / currentprice);
+    else setmaxamt(yu);
+    setcurrenthold(yu);
+    console.log("holding" + yu);
+  }, [company, port, hist, hist2]);
   useEffect(() => {
     let temp2 = [];
     console.log("yo" + company);
@@ -196,7 +206,6 @@ export default function Home() {
           sp: hist[i].sp,
           date: hist[i].date,
         });
-       
       }
     }
 
@@ -210,10 +219,11 @@ export default function Home() {
       });
     console.log("asdf" + temp2);
     sethist2(temp2);
-  }, [company,hist]);
-
+  }, [company, hist]);
+  
   return (
     <ProtectedRoute>
+      {}
       <div id="root">
         <Nav />
         <div className="parent1">
@@ -222,19 +232,57 @@ export default function Home() {
               return (
                 <Ccard
                   name={p.name}
-                  Price={p.Price}
+                  Price={setcurrentprice}
                   change={p.change}
                   functi={getcompany}
+                
                 />
               );
             })}
           </div>
-          <div className="middle">{company}</div>
+
+          <div className="middle">
+            {/* { chart } */}
+            {graph != undefined ? (
+              <Chart id="chart" title="Stock Price" dataSource={graph}>
+                <CommonSeriesSettings argumentField="date" type="candlestick" />
+                <Series
+                  name={company}
+                  openValueField="o"
+                  highValueField="h"
+                  lowValueField="l"
+                  closeValueField="c"
+                >
+                
+                  <Reduction color="red" />
+                </Series>
+                <ArgumentAxis workdaysOnly={true}>
+                  <Label format="shortDate" />
+                </ArgumentAxis>
+                <ValueAxis tickInterval={0}>
+                  <Title text="US dollars" />
+                  <Label>
+                    <Format precision={0} type="currency" />
+                  </Label>
+                </ValueAxis>
+                <Legend itemTextPosition="left" />
+                <Export enabled={true} />
+                <Tooltip
+                  enabled={true}
+                  location="edge"
+                  
+                />
+              </Chart>
+            ) : (
+              <p>loading...</p>
+            )}
+          </div>
           <div className="right">
             {/* <button onClick={dataforchart(props)}>Data</button> */}
+            <div id="right_top">Transaction History of {company}</div>
             <FixedHeaderStory
               fixedHeader
-              fixedHeaderScrollHeight="100%"
+              fixedHeaderScrollHeight="90%"
               columns={columns}
               data={hist2}
             />
@@ -281,69 +329,3 @@ export default function Home() {
   );
 }
 
-/*
-{
-      name: "GE",
-      status: "buy",
-      quantity: 69,
-      price: 1000,
-      date: "2022-10-24 12:33:19.387",
-    },
-    {
-      name: "GE",
-      status: "buy",
-      quantity: 69,
-      price: 1000,
-      date: "2022-10-24 12:33:19.387",
-    },
-    {
-      name: "GE",
-      status: "buy",
-      quantity: 69,
-      price: 1000,
-      date: "2022-10-24 12:33:19.387",
-    },
-    {
-      name: "GE",
-      status: "buy",
-      quantity: 69,
-      price: 1000,
-      date: "2022-10-24 12:33:19.387",
-    },
-    {
-      name: "GE",
-      status: "buy",
-      quantity: 69,
-      price: 1000,
-      date: "2022-10-24 12:33:19.387",
-    },
-    {
-      name: "GE",
-      status: "buy",
-      quantity: 69,
-      price: 1000,
-      date: "2022-10-24 12:33:19.387",
-    },
-    {
-      name: "GE",
-      status: "buy",
-      quantity: 39,
-      price: 1000,
-      date: "2022-10-24 12:27:14.413",
-    },
-    {
-      name: "GE",
-      status: "buy",
-      quantity: 1,
-      price: 1000,
-      date: "2022-10-24 12:28:03.878",
-    },
-    {
-      name: "GE",
-      status: "sell",
-      quantity: 40,
-      price: 1000,
-      date: "2022-10-24 12:33:19.387",
-    },
-  ];
-*/

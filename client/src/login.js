@@ -1,13 +1,14 @@
 import "./login.css";
 import Signup from "./signup";
-import Home from "./home";
+import stockvalue from "./Stock_Values";
 import { redirect, useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie'
 import { useEffect, useLayoutEffect, useState } from "react";
 import request from "./request";
-
+import getlive from "./livedata";
 
 export default function Login() {
+ 
   const navigate = useNavigate();
   const [loggedin , setLoggedin] = useState(-1);
   useEffect(()=>{

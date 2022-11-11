@@ -20,7 +20,7 @@ app.post("/auth", async (req, res) => {
     return;
   }
   try {
-    jwt.verify(token, `process.env.ACCESS_TOKEN_SECRET`, (err, user) => {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
       if (err) {
         console.log("autherror" + token);
         res.sendStatus(403);
@@ -67,7 +67,7 @@ app.post("/login", async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
     const user = { name: username };
-    const atoken = jwt.sign(user, `process.env.ACCESS_TOKEN_SECRET`);
+    const atoken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
     const q1 = await pool.query("SELECT * FROM users WHERE username = $1", [
       username,
     ]);

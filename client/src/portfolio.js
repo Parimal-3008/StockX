@@ -1,14 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { render } from "react-dom";
 import "./portfolio.css";
+import PieChart, {Legend,Export,Series,Label,Font,Connector,} from 'devextreme-react/pie-chart';
+import {  Chart, CommonSeriesSettings, Format,} from 'devextreme-react/chart';
 import Nav from "./nav";
 import FixedHeaderStory from "react-data-table-component";
 import ProtectedRoute from "./ProtectedRoute";
 import { getfunds,gethistory,getportfolio } from "./getdata";
+import piedata from "./piechart_data";
+import bardata from "./bar_data";
+import getlive from "./livedata";
+function customizeText(arg) {
+  return `${arg.valueText} (${arg.percentText})`;
+}
+
 export default function Portfolio() {
   const [funds,setfunds] = useState("0");
   const [hist,sethist] = useState({});
   const [port,setport] = useState({});
+  const [piedata1,setpiedata1] = useState({});
+  const [bardata1,setbardata1] = useState({});
+  const [lived,setlive] = useState(new Map());
+  
   let currentstockhistory = [
     {
       name: "GE",
@@ -154,11 +167,11 @@ export default function Portfolio() {
     },
     {
       name: "Current Value",     
-      selector: (row) =>"20",
+      selector: (row) =>row.quantity*(lived.get(row.stockname)),
     },
     {
       name: "Profit/Loss",
-      selector: (row) => (row.quantity* 20)-row.total_price,
+      selector: (row) => (row.quantity*(lived.get(row.stockname)))-row.total_price,
     },
   ];
   const columns = [
@@ -187,9 +200,25 @@ export default function Portfolio() {
     getfunds(setfunds);    
     gethistory(sethist);
     getportfolio(setport);
+   getlive(setlive).then(r=> setlive(r));
+    // setbardata1(bardata(port));
+    
     
   }, []);
+  useEffect(()=>{
+    setpiedata1(piedata(port));
+    
+  },[port]);
+  useEffect(()=>{
+    console.log(lived);
+    if(lived.length!=0 )
+    {
+      setbardata1(bardata(port,lived,setbardata1));
+      // console.log(bardata1);
+    }
+    
 
+  },[port,lived])
   return (
     <ProtectedRoute>
     <div>
@@ -202,7 +231,65 @@ export default function Portfolio() {
               <div className="joker">Current holdings:</div>
               <div className="joker">Profit/Loss:</div>
             </div>
-            <div id="bottom41"></div>
+            <div id="bottom41">
+            <div id="piechart1">
+            <PieChart id="pie"
+        palette="Bright"
+        dataSource={piedata1}
+        title="Investment Distribution"
+      >
+        <Legend
+          orientation="horizontal"
+          itemTextPosition="right"
+          horizontalAlignment="center"
+          verticalAlignment="bottom"
+          columnCount={4} />
+        <Export enabled={true} />
+        <Series argumentField="Stock" valueField="Investment">
+          <Label
+            visible={true}
+            position="columns"
+            customizeText={customizeText}>
+            <Font size={12} />
+            <Connector visible={true} width={0.5} />
+          </Label>
+        </Series>
+      </PieChart>
+            </div>
+            <div id="bargraph">
+            <Chart id="chart"
+        title="Stock with their investment and current valuation"
+        dataSource={bardata1}
+        onPointClick={(e)=>{e.target.select();}}
+      >
+        <CommonSeriesSettings
+          argumentField="state"
+          type="bar"
+          hoverMode="allArgumentPoints"
+          selectionMode="allArgumentPoints"
+        >
+          <Label visible={true}>
+            <Format type="fixedPoint" precision={0} />
+          </Label>
+        </CommonSeriesSettings>
+        <Series
+        argumentField="Stock"
+          valueField="Current"
+          name="Current Valuation"
+        />
+        <Series
+          argumentField="Stock"
+          valueField="Investment"
+          name="Investment"
+        />
+       
+         
+       
+        <Legend verticalAlignment="bottom" horizontalAlignment="center"></Legend>
+        <Export enabled={true} />
+      </Chart>
+            </div>
+           </div>
           </div>
           <div id="right4">
             <div id="top41"> Holdings</div>
