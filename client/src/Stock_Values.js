@@ -2,12 +2,12 @@
 
 // replace the "demo" apikey below with your own key from https://www.alphavantage.co/support/#api-key
 
-
-const stockvalue = async (org,type) => {
+import API_KEY_S from "./apikey.js"
+const stockvalue = async (org,type,key) => {
   let data = [];
-  var url1 = `https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=${org}&apikey=0FJEUPLIJDA8RM44`;
-var url2 = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=${org}&apikey=0FJEUPLIJDA8RM44`;
-var url3 =`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${org}&apikey=0FJEUPLIJDA8RM44`;
+  var url1 = `https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=${org}&apikey=${API_KEY_S}`;
+var url2 = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=${org}&apikey=${API_KEY_S}`;
+var url3 =`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${org}&apikey=${API_KEY_S}`;
   //TIME_SERIES_INTRADAY url1,3
   //TIME_SERIES_MONTHLY url2
   let urla;

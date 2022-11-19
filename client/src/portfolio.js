@@ -21,6 +21,11 @@ export default function Portfolio() {
   const [piedata1,setpiedata1] = useState({});
   const [bardata1,setbardata1] = useState({});
   const [lived,setlive] = useState(new Map());
+  const [netinvest,setnetinvest]= useState();
+  const [netvalue,setnetvalue]= useState();
+  const [netstautus,setnetstatus]= useState();
+  
+  
   
   let currentstockhistory = [
     {
@@ -208,12 +213,24 @@ export default function Portfolio() {
   useEffect(()=>{
     setpiedata1(piedata(port));
     
+
+    
   },[port]);
   useEffect(()=>{
     console.log(lived);
     if(lived.length!=0 )
     {
       setbardata1(bardata(port,lived,setbardata1));
+      let sum =0;let sum1 =0;
+      for(let i in bardata1)
+      {
+         sum+=bardata1[i]['Investment'];
+         sum1+= bardata1[i]['Current']
+      }
+      setnetinvest(sum);
+      setnetvalue(sum1);
+      setnetstatus(sum1-sum);
+
       // console.log(bardata1);
     }
     
@@ -227,9 +244,9 @@ export default function Portfolio() {
         <div id="upper4">
           <div id="left4">
             <div id="top41">
-              <div className="joker">Total investments:</div>
-              <div className="joker">Current holdings:</div>
-              <div className="joker">Profit/Loss:</div>
+              <div className="joker">Total investments: ${netinvest}</div>
+              <div className="joker">Current holdings: ${netvalue}</div>
+              <div className="joker">Profit/Loss: ${netstautus}</div>
             </div>
             <div id="bottom41">
             <div id="piechart1">
@@ -309,10 +326,11 @@ export default function Portfolio() {
           <div id="top42">Transaction History</div>
           <div id="bottom41">
             <FixedHeaderStory
-              fixedHeader
+              fixedHeader='true'
               fixedHeaderScrollHeight="90%"
               columns={columns}
               data={hist}
+              // pagination
             />
           </div>
         </div>

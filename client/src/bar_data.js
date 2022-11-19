@@ -24,7 +24,7 @@ const bardata = (port,lived,setbardata1) => {
     //     port[i]["quantity"]) *
     //     Number(
     //       (async () => {
-    //         let url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${port[i]["stockname"]}&interval=1min&apikey=0FJEUPLIJDA8RM44`;
+    //         let url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${port[i]["stockname"]}&interval=1min&apikey=${API_KEY_S}`;
     //         await fetch(url)
     //           .then((response) => response.json())
     //           .then((json) => {
