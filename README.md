@@ -4,7 +4,7 @@
 
 ∗ JWT authentication was used at time of logging in and registration of user
 
-∗ Alphavantage API was used for fetching current market price of each of the listed stock
+∗ Alphavantage API was used for fetching current market price of each of the listed stock. Make sure you put your own api key in the code.
 
 ∗ CanvasJS library was used to display daily prices of selected stock over past few months using candlestick graph
 
@@ -15,7 +15,7 @@
 
 ∗ Either clone the repository or download the entire zip folder.
 
-∗ VSCode is recommended to run the application but other editors can also be used.
+∗ VSCode is recommended but other editors can also be used.
 
 ∗ Make sure you have node.js and PostgreSQL installed.
 
